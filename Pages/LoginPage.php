@@ -127,8 +127,9 @@ class LoginPage extends Page implements ILoginPage
 		$this->Set('GoogleState', strtr(base64_encode("resume=$scriptUrl/external-auth.php%3Ftype%3Dgoogle"), '+/=', '-_,'));
 		$this->Set('EnableCaptcha', Configuration::Instance()->GetSectionKey(ConfigSection::AUTHENTICATION, ConfigKeys::AUTHENTICATION_CAPTCHA_ON_LOGIN, new BooleanConverter()));
 
-		$this->Set('LLPRedirectUri', 'http://localhost/booked/web/external-auth.php%3Ftype%3Dllp');
-		$this->Set('LLPClientId', '12344');
+		$this->Set('LLPRedirectUri', Configuration::Instance()->GetSectionKey('oauth', 'llp.redirect_uri'));
+		$this->Set('LLPClientId', Configuration::Instance()->GetSectionKey('oauth', 'llp.client_id'));
+		$this->Set('LLPAuthorizeUri', Configuration::Instance()->GetSectionKey('oauth', 'llp.authorize_uri'));
 		$this->Set('LLPState', bin2hex(random_bytes(8)));
 	}
 

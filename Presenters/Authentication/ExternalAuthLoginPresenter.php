@@ -84,8 +84,13 @@ class ExternalAuthLoginPresenter
 
 	private function GetLLPAccessToken() {
 		$code = $_GET['code'];
+		$client_id = Configuration::Instance()->GetSectionKey('oauth', 'llp.client_id');
+		$redirect_uri = Configuration::Instance()->GetSectionKey('oauth', 'llp.redirect_uri');
+		$token_uri = Configuration::Instance()->GetSectionKey('oauth', 'llp.token_uri');
+		$client_secret = Configuration::Instance()->GetSectionKey('oauth', 'llp.client_secret');
 		$ch = curl_init();
-		curl_setopt($ch, CURLOPT_URL, "llp/app_dev.php/oauth/token?grant_type=authorization_code&code=$code&redirect_uri=http://localhost/booked/web/external-auth.php%3Ftype%3Dllp&client_id=12344&client_secret=4321");
+		$url = "$token_uri?grant_type=authorization_code&code=$code&redirect_uri=$redirect_uri&client_id=$client_id&client_secret=$client_secret";
+		curl_setopt($ch, CURLOPT_URL, $url);
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 		$response = curl_exec($ch);
 		$httpcode = curl_getinfo($ch, CURLINFO_HTTP_CODE);

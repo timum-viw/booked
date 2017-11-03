@@ -105,7 +105,7 @@ along with Booked Scheduler.  If not, see <http://www.gnu.org/licenses/>.
 					{assign var=socialClass value="col-sm-12"}
 				{/if}
 				<div class="{$socialClass} social-login" id="socialLoginLLP">
-					<a href="http://llp/zend/oauth/authorize?scope=profile&state={$LLPState}&redirect_uri={$LLPRedirectUri}&response_type=code&client_id={$LLPClientId}" class="btn btn-info">
+					<a href="{$LLPAuthorizeUri}?scope=profile&state={$LLPState}&redirect_uri={$LLPRedirectUri}&response_type=code&client_id={$LLPClientId}" class="btn btn-info">
 						Mit LLP Account einloggen
 					</a>
 				</div>
