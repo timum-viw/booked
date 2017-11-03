@@ -30,7 +30,6 @@ along with Booked Scheduler.  If not, see <http://www.gnu.org/licenses/>.
         {validator id="captcha" key="CaptchaMustMatch"}
         {/validation_group}
     {/if}
-
 	<div class="col-md-offset-3 col-md-6 col-xs-12 ">
 		<form role="form" name="login" id="login" class="form-horizontal" method="post"
 			  action="{$smarty.server.SCRIPT_NAME}">
@@ -99,13 +98,17 @@ along with Booked Scheduler.  If not, see <http://www.gnu.org/licenses/>.
                 {/if}
 
 				<div class="clearfix"></div>
-
+				<p style="text-align: center;">- oder -</p>
 				{if $AllowGoogleLogin && $AllowFacebookLogin}
 					{assign var=socialClass value="col-sm-12 col-md-6"}
 				{else}
 					{assign var=socialClass value="col-sm-12"}
 				{/if}
-
+				<div class="{$socialClass} social-login" id="socialLoginLLP">
+					<a href="http://llp/zend/oauth/authorize?scope=profile&state={$LLPState}&redirect_uri={$LLPRedirectUri}&response_type=code&client_id={$LLPClientId}" class="btn btn-info">
+						Mit LLP Account einloggen
+					</a>
+				</div>
 				{if $AllowGoogleLogin}
 					<div class="{$socialClass} social-login" id="socialLoginGoogle">
 						<a href="https://accounts.google.com/o/oauth2/v2/auth?scope=email%20profile&state={$GoogleState}&redirect_uri=http://www.social.twinkletoessoftware.com/googleresume.php&response_type=code&client_id=531675809673-3sfvrchh6svd9bfl7m55dao8n4s6cqpc.apps.googleusercontent.com">

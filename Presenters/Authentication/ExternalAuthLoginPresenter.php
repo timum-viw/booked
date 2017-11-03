@@ -45,23 +45,79 @@ class ExternalAuthLoginPresenter
 
 	public function PageLoad()
 	{
+		if(isset($_GET['error'])) {
+			$this->page->ShowError([$_GET['error']]);
+		}
+
 		if ($this->page->GetType() == 'google')
 		{
-			$this->ProcessSocialSingleSignOn('googleprofile.php');
+			$profile = $this->GetSocialProfile('http://www.social.twinkletoessoftware.com/googleprofile.php');
+			
 		}
 		if ($this->page->GetType() == 'fb')
 		{
-			$this->ProcessSocialSingleSignOn('fbprofile.php');
+			$profile = $this->GetSocialProfile('http://www.social.twinkletoessoftware.com/fbprofile.php');
+		}
+		if ($this->page->GetType() == 'llp')
+		{
+			$token = $this->GetLLPAccessToken();
+			if(!$token) {
+				$this->page->ShowError(['access token could not be retrieved']);
+			}
+			$profile = $this->GetLLPProfile($token->access_token);
+		}
+
+		if($profile) {
+			$this->ProcessSocialSingleSignOn($profile);
+		} else {
+			$this->page->ShowError(['no profile found']);
 		}
 	}
 
-	private function ProcessSocialSingleSignOn($page)
+	private function GetSocialProfile($page)
 	{
 		$code = $_GET['code'];
 		Log::Debug('Logging in with social. Code=%s', $code);
-		$result = file_get_contents("http://www.social.twinkletoessoftware.com/$page?code=$code");
-		$profile = json_decode($result);
+		$result = file_get_contents("$page?code=$code");
+		return json_decode($result);
+	}
 
+	private function GetLLPAccessToken() {
+		$code = $_GET['code'];
+		$ch = curl_init();
+		curl_setopt($ch, CURLOPT_URL, "llp/app_dev.php/oauth/token?grant_type=authorization_code&code=$code&redirect_uri=http://localhost/booked/web/external-auth.php%3Ftype%3Dllp&client_id=12344&client_secret=4321");
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+		$response = curl_exec($ch);
+		$httpcode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+		curl_close($ch);
+
+		return $httpcode === 200 ? json_decode($response) : false;
+	}
+
+	private function GetLLPProfile($token)
+	{
+		$ch = curl_init();
+		curl_setopt($ch, CURLOPT_URL, 'llp/zend/mobil/studi');
+		$headr[] = 'Content-type: application/json';
+		$headr[] = 'Authorization: Bearer '.$token;
+		curl_setopt($ch, CURLOPT_HTTPHEADER, $headr);
+
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+		$response = curl_exec($ch);
+		$httpcode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+		curl_close($ch);
+
+		if($httpcode === 200) {
+			$profile = json_decode($response)->student_data;
+			[$profile->first_name, $profile->last_name] = explode(" ", $profile->name);
+			return $profile;
+		} else {
+			return false;
+		}
+	}
+
+	private function ProcessSocialSingleSignOn($profile)
+	{
 		$requiredDomainValidator = new RequiredEmailDomainValidator($profile->email);
 		$requiredDomainValidator->Validate();
 		if (!$requiredDomainValidator->IsValid())
