@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Copyright 2017 Nick Korbel
+ * Copyright 2017 Nick Korbel, Vincent Wyszynski
  *
  * This file is part of Booked Scheduler.
  *
@@ -20,6 +20,7 @@
  */
 
 require_once(ROOT_DIR . 'Presenters/Authentication/LoginRedirector.php');
+require_once(ROOT_DIR . 'lib/external/php-jwt/JWT.php');
 
 class ExternalAuthLoginPresenter
 {
@@ -49,23 +50,11 @@ class ExternalAuthLoginPresenter
 			$this->page->ShowError([$_GET['error']]);
 		}
 
-		if ($this->page->GetType() == 'google')
-		{
-			$profile = $this->GetSocialProfile('http://www.social.twinkletoessoftware.com/googleprofile.php');
-			
+		$token = $this->GetAccessToken($this->page->GetType());
+		if(!$token) {
+			$this->page->ShowError(['access token could not be retrieved']);
 		}
-		if ($this->page->GetType() == 'fb')
-		{
-			$profile = $this->GetSocialProfile('http://www.social.twinkletoessoftware.com/fbprofile.php');
-		}
-		if ($this->page->GetType() == 'llp')
-		{
-			$token = $this->GetLLPAccessToken();
-			if(!$token) {
-				$this->page->ShowError(['access token could not be retrieved']);
-			}
-			$profile = $this->GetLLPProfile($token->access_token);
-		}
+		$profile = $this->GetProfile($token->id_token);
 
 		if($profile) {
 			$this->ProcessSocialSingleSignOn($profile);
@@ -74,51 +63,39 @@ class ExternalAuthLoginPresenter
 		}
 	}
 
-	private function GetSocialProfile($page)
-	{
-		$code = $_GET['code'];
-		Log::Debug('Logging in with social. Code=%s', $code);
-		$result = file_get_contents("$page?code=$code");
-		return json_decode($result);
+	private function GetProfile($id_token) {
+		[$header, $payload, $sig] = explode(".", $id_token);
+		$token = \Firebase\JWT\JWT::jsonDecode(\Firebase\JWT\JWT::urlsafeB64Decode($payload));
+		[$profile->first_name, $profile->last_name] = explode(" ", $token->name);
+		$profile->email = $token->email;
+		return $profile;
 	}
 
-	private function GetLLPAccessToken() {
+	private function GetAccessToken($provider) {
 		$code = $_GET['code'];
-		$client_id = Configuration::Instance()->GetSectionKey('oauth', 'llp.client_id');
-		$redirect_uri = Configuration::Instance()->GetSectionKey('oauth', 'llp.redirect_uri');
-		$token_uri = Configuration::Instance()->GetSectionKey('oauth', 'llp.token_uri');
-		$client_secret = Configuration::Instance()->GetSectionKey('oauth', 'llp.client_secret');
+		$OAuthProvider = Configuration::Instance()->GetSectionKey('oauth', $provider, new Class {
+			public function Convert($value) {return $value;}
+		});
+		$client_id = $OAuthProvider['client_id'];
+		$redirect_uri = $OAuthProvider['redirect_uri'];
+		$token_uri = $OAuthProvider['token_uri'];
+		$client_secret = urlencode($OAuthProvider['client_secret']);
 		$ch = curl_init();
-		$url = "$token_uri?grant_type=authorization_code&code=$code&redirect_uri=$redirect_uri&client_id=$client_id&client_secret=$client_secret";
+		$url = "$token_uri";
+
+		if($OAuthProvider['token_method'] === "POST") {
+			curl_setopt($ch, CURLOPT_POST, 1);
+			curl_setopt($ch, CURLOPT_POSTFIELDS, "grant_type=authorization_code&code=$code&redirect_uri=$redirect_uri&client_id=$client_id&client_secret=$client_secret");
+		} else {
+			$url .= "?grant_type=authorization_code&code=$code&redirect_uri=$redirect_uri&client_id=$client_id&client_secret=$client_secret";
+		}
+
 		curl_setopt($ch, CURLOPT_URL, $url);
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 		$response = curl_exec($ch);
 		$httpcode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 		curl_close($ch);
-
 		return $httpcode === 200 ? json_decode($response) : false;
-	}
-
-	private function GetLLPProfile($token)
-	{
-		$ch = curl_init();
-		curl_setopt($ch, CURLOPT_URL, 'llp/zend/mobil/studi');
-		$headr[] = 'Content-type: application/json';
-		$headr[] = 'Authorization: Bearer '.$token;
-		curl_setopt($ch, CURLOPT_HTTPHEADER, $headr);
-
-		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-		$response = curl_exec($ch);
-		$httpcode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-		curl_close($ch);
-
-		if($httpcode === 200) {
-			$profile = json_decode($response)->student_data;
-			[$profile->first_name, $profile->last_name] = explode(" ", $profile->name);
-			return $profile;
-		} else {
-			return false;
-		}
 	}
 
 	private function ProcessSocialSingleSignOn($profile)

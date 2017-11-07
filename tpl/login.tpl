@@ -105,21 +105,21 @@ along with Booked Scheduler.  If not, see <http://www.gnu.org/licenses/>.
 					{assign var=socialClass value="col-sm-12"}
 				{/if}
 				<div class="{$socialClass} social-login" id="socialLoginLLP">
-					<a href="{$LLPAuthorizeUri}?scope=profile&state={$LLPState}&redirect_uri={$LLPRedirectUri}&response_type=code&client_id={$LLPClientId}" class="btn btn-info">
+					<a href="{$LLPOAuthProvider.authorize_uri}?scope=openid%20email%20name&state={$OAuthState}&redirect_uri={$LLPOAuthProvider.redirect_uri|escape:'url'}&response_type=code&client_id={$LLPOAuthProvider.client_id}" class="btn btn-info">
 						Mit LLP Account einloggen
 					</a>
 				</div>
 				{if $AllowGoogleLogin}
 					<div class="{$socialClass} social-login" id="socialLoginGoogle">
-						<a href="https://accounts.google.com/o/oauth2/v2/auth?scope=email%20profile&state={$GoogleState}&redirect_uri=http://www.social.twinkletoessoftware.com/googleresume.php&response_type=code&client_id=531675809673-3sfvrchh6svd9bfl7m55dao8n4s6cqpc.apps.googleusercontent.com">
+						<a href="{$GoogleOAuthProvider.authorize_uri}?scope=openid%20email%20profile&state={$OAuthState}&redirect_uri={$GoogleOAuthProvider.redirect_uri}&response_type=code&client_id={$GoogleOAuthProvider.client_id}">
 							<img src="img/external/btn_google_signin_dark_normal_web.png" alt="Sign in with Google"/>
 						</a>
 					</div>
 				{/if}
 				{if $AllowFacebookLogin}
-					<div class="{$socialClass} social-login" id="socialLoginFacebook">
-						<a href="http://www.social.twinkletoessoftware.com/fblogin.php?protocol={$Protocol}&resume={$ScriptUrlNoProtocol}/external-auth.php%3Ftype%3Dfb">
-							<img style="max-height:42px" src="img/external/btn_facebook_login.png" alt="Sign in with Facebook"/>
+					<div class="{$socialClass} social-login" id="socialLoginGoogle">
+						<a href="{$FbOAuthProvider.authorize_uri}?scope=openid%20email%20profile&state={$OAuthState}&redirect_uri={$FbOAuthProvider.redirect_uri}&response_type=code&client_id={$FbOAuthProvider.client_id}">
+							<img src="img/external/btn_google_signin_dark_normal_web.png" alt="Sign in with Google"/>
 						</a>
 					</div>
 				{/if}
