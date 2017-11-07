@@ -64,9 +64,9 @@ class ExternalAuthLoginPresenter
 	}
 
 	private function GetProfile($id_token) {
-		[$header, $payload, $sig] = explode(".", $id_token);
+		list($header, $payload, $sig) = explode(".", $id_token);
 		$token = \Firebase\JWT\JWT::jsonDecode(\Firebase\JWT\JWT::urlsafeB64Decode($payload));
-		[$profile->first_name, $profile->last_name] = explode(" ", $token->name);
+		list($profile->first_name, $profile->last_name) = explode(" ", $token->name);
 		$profile->email = $token->email;
 		return $profile;
 	}
@@ -77,7 +77,7 @@ class ExternalAuthLoginPresenter
 			public function Convert($value) {return $value;}
 		});
 		$client_id = $OAuthProvider['client_id'];
-		$redirect_uri = $OAuthProvider['redirect_uri'];
+		$redirect_uri = urlencode($OAuthProvider['redirect_uri']);
 		$token_uri = $OAuthProvider['token_uri'];
 		$client_secret = urlencode($OAuthProvider['client_secret']);
 		$ch = curl_init();
