@@ -46,8 +46,13 @@ class ExternalAuthLoginPresenter
 
 	public function PageLoad()
 	{
+		if($_GET['state'] !== ServiceLocator::GetServer()->GetSession("OAuthState")) {
+			$this->page->ShowError(['invalid state']);
+			return;
+		}
 		if(isset($_GET['error'])) {
 			$this->page->ShowError([$_GET['error']]);
+			return;
 		}
 
 		$token = $this->GetAccessToken($this->page->GetType());

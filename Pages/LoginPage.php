@@ -131,7 +131,9 @@ class LoginPage extends Page implements ILoginPage
 		});
 		$this->Set('LLPOAuthProvider', $OAuthProviders['llp']);
 		$this->Set('GoogleOAuthProvider', $OAuthProviders['google']);
-		$this->Set('OAuthState', bin2hex(random_bytes(8)));
+		$OAuthState = bin2hex(random_bytes(8));
+		$this->Set('OAuthState', $OAuthState);
+		$this->server->SetSession("OAuthState", $OAuthState);
 	}
 
 	public function PageLoad()
