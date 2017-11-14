@@ -2,13 +2,24 @@
 body {
 	font-family: 'Roboto', sans-serif;
 	margin: 15px;
-	border: solid 1px grey;
 }
 
 pre {
 	background-color: #ddd;
 	border: solid 1px #444;
 	border-radius: 2px;
+	margin: 10px;
+	padding: 5px;
+}
+
+a {
+	display: block;
+	width: 100%;
+	text-align: center;
+}
+
+p {
+	padding: 4px;
 }
 </style>
 <h3>Hi {$FirstName}!</h3>
