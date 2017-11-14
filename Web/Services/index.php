@@ -35,6 +35,7 @@ require_once(ROOT_DIR . 'WebServices/AttributesWebService.php');
 require_once(ROOT_DIR . 'WebServices/AttributesWriteWebService.php');
 require_once(ROOT_DIR . 'WebServices/GroupsWebService.php');
 require_once(ROOT_DIR . 'WebServices/AccessoriesWebService.php');
+require_once(ROOT_DIR . 'WebServices/TelegramWebService.php');
 
 require_once(ROOT_DIR . 'Web/Services/Help/ApiHelpPage.php');
 
@@ -59,6 +60,7 @@ RegisterSchedules($server, $registry);
 RegisterAttributes($server, $registry);
 RegisterGroups($server, $registry);
 RegisterAccessories($server, $registry);
+RegisterTelegram($server, $registry);
 
 $app->hook('slim.before.dispatch', function () use ($app, $server, $registry)
 {
@@ -206,5 +208,13 @@ function RegisterGroups(SlimServer $server, SlimWebServiceRegistry $registry)
 	$category = new SlimWebServiceRegistryCategory('Groups');
 	$category->AddSecureGet('/', array($webService, 'GetGroups'), WebServices::AllGroups);
 	$category->AddSecureGet('/:groupId', array($webService, 'GetGroup'), WebServices::GetGroup);
+	$registry->AddCategory($category);
+}
+
+function RegisterTelegram(SlimServer $server, SlimWebServiceRegistry $registry)
+{
+	$telegramService = new TelegramWebService($server, new UserRepository());
+	$category = new SlimWebServiceRegistryCategory('Telegram');
+	$category->AddPost('/', array($telegramService, 'GetUpdate'), null);
 	$registry->AddCategory($category);
 }
