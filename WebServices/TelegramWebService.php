@@ -71,7 +71,7 @@ class TelegramWebService
 			$user = $this->userRepository->FindByEmail($user_email);
 			if(!$user) {
 				list($firstname, $lastname) = explode(".", ucwords(str_replace(["-","@"], [" ","."], $user_email), " ."));
-				$user = (new Registration())->Register($user_email, $user_email, $firstname, $lastname, Password::GenerateRandom(), null, "de_de", null);
+				$user = (new Registration())->Register($user_email, $user_email, $firstname, $lastname, Password::GenerateRandom(), null, "en_us", null);
 			}
 
 			$token = TelegramToken::Create($user_email);
