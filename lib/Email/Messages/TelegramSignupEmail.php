@@ -62,6 +62,6 @@ class TelegramSignupEmail extends EmailMessage
 		$this->Set('FirstName', $this->user->FirstName());
 		$this->Set('EmailAddress', $this->user->EmailAddress());
 		$this->Set('ActivationUrl', $activationUrl);
-		return $this->FetchTemplate('AccountActivation.tpl');
+		return $this->FetchTemplate('TelegramSignup.tpl');
 	}
 }
