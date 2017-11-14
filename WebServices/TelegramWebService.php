@@ -4,6 +4,7 @@ require_once(ROOT_DIR . 'lib/WebService/namespace.php');
 require_once(ROOT_DIR . 'WebServices/Responses/TelegramResponse.php');
 require_once(ROOT_DIR . 'Domain/TelegramToken.php');
 require_once(ROOT_DIR . 'Domain/Access/TelegramTokenRepository.php');
+require_once(ROOT_DIR . 'lib/Email/Messages/TelegramSignupEmail.php');
 
 class TelegramWebService 
 {
@@ -70,10 +71,12 @@ class TelegramWebService
 			$user = $this->userRepository->FindByEmail($user_email);
 			if(!$user) {
 				list($firstname, $lastname) = explode(".", ucwords(str_replace(["-","@"], [" ","."], $user_email), " ."));
-				(new Registration())->Register($user_email, $user_email, $firstname, $lastname, Password::GenerateRandom(), null, "de_de", null);
+				$user = (new Registration())->Register($user_email, $user_email, $firstname, $lastname, Password::GenerateRandom(), null, "de_de", null);
 			}
 
-			$this->tokenRepository->Add(TelegramToken::Create($user_email));
+			$token = TelegramToken::Create($user_email);
+			$this->tokenRepository->Add($token);
+			ServiceLocator::GetEmailService()->Send(new TelegramSignupEmail($user, $token->Token()));
 			$this->response->addParam("text", "I have send you an email with further instruction on how to validate your account. Please check your email inbox.");
 		}
 		else
@@ -88,8 +91,7 @@ class TelegramWebService
 		$user = $token && $this->userRepository->FindByEmail($token->UserEmail());
 		if(!($token && $user && $token->isValid()))
 		{
-			$this->response->addParam("text", "Please tell me your charite.de email address to signup for my booking services.");
-			$this->response->addParam("reply_markup", ["force_reply" => true]);
+			$this->response->addParam("text", "Please tell me your charite.de email address to /signup for my booking services.");
 		}
 		else
 		{

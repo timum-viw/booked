@@ -56,6 +56,7 @@ class ProfilePresenter extends ActionPresenter
 		$this->page = $page;
 		$this->userRepository = $userRepository;
 		$this->attributeService = $attributeService;
+		$this->telegramRepository = new TelegramTokenRepository();
 
 		$this->AddAction(ProfileActions::Update, 'UpdateProfile');
 		$this->AddAction(ProfileActions::ChangeDefaultSchedule, 'ChangeDefaultSchedule');
@@ -87,6 +88,12 @@ class ProfilePresenter extends ActionPresenter
 		$this->PopulateTimezones();
 		$this->PopulateHomepages();
 		$this->page->SetAllowedActions(PluginManager::Instance()->LoadAuthentication());
+
+		if(!(($token = $this->telegramRepository->GetByUserEmail($user->EmailAddress())) !== null && $token->hasChat()))
+		{
+			$token = (new TelegramTokenRepository())->AddForUserEmail($user->EmailAddress());
+			$this->page->Set('TelegramToken', $token->Token());
+		}
 	}
 
 	public function UpdateProfile()

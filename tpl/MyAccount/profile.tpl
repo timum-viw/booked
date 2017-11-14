@@ -199,6 +199,12 @@ along with Booked Scheduler.  If not, see <http://www.gnu.org/licenses/>.
 					{translate key='Update'}
 				</button>
 			</div>
+			{if $TelegramToken }
+			<div style="clear: both;">
+				<p>&nbsp;</p>
+				<a class="btn btn-info btn-large btn-block" href="https://telegram.me/BhhChariteBot?start={$TelegramToken}">Mit Telegram verbinden</a>
+			</div>
+			{/if}
 			{csrf_token}
 		</form>
 	</div>
