@@ -56,12 +56,9 @@ class TelegramSignupEmail extends EmailMessage
 	 */
 	function Body()
 	{
-		$activationUrl = new Url(Configuration::Instance()->GetScriptUrl());
-		$activationUrl = "https://telegram.me/BhhChariteBot?start=".$this->activationCode;
-
 		$this->Set('FirstName', $this->user->FirstName());
 		$this->Set('EmailAddress', $this->user->EmailAddress());
-		$this->Set('ActivationUrl', $activationUrl);
+		$this->Set('ActivationCode', $this->activationCode);
 		return $this->FetchTemplate('TelegramSignup.tpl');
 	}
 }

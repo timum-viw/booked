@@ -5,17 +5,14 @@ body {
 }
 
 pre {
-	background-color: #ddd;
-	border: solid 1px #444;
-	border-radius: 2px;
-	margin: 10px;
-	padding: 5px;
+	text-align: center;
 }
 
 a {
 	display: block;
 	width: 100%;
 	text-align: center;
+	margin-top: 10px;
 }
 
 p {
@@ -24,10 +21,11 @@ p {
 </style>
 <h3>Hi {$FirstName}!</h3>
 <p>Somebody signed you up for the BhhCharite Telegram Bot.</p>
-<p>To finish your registration and start booking please klick this link <a href="{$ActivationUrl}">{$ActivationUrl}</a>.</p>
-<p>If this doesn't work pleas copy this line
+<p>To finish your registration and start booking please click this link <a href="https://telegram.me/BhhChariteBot?start={$ActivationCode}">https://telegram.me/BhhChariteBot?start={$ActivationCode}</a></p>
+<p>If this doesn't work please copy this line
 <pre>
-	/start {$ActivationUrl}
+	/start {$ActivationCode}
 </pre>
-<p>and paste it into your Chat with the BhhChariteBot.</p>
+<p>and paste it into your chat with the BhhChariteBot.</p>
 <p>If you still have problems just reply to this email and we will help you getting set up.</p>
+<p>Have fun booking!</p>
