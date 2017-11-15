@@ -38,7 +38,7 @@ class AccessCode
     /**
      * @return string
      */
-    public function Token()
+    public function Code()
     {
         return $this->code;
     }

@@ -38,8 +38,8 @@ class TelegramWebService
 			}
 
 			$token = AccessCode::Create($user_email);
-			$this->tokenRepository->Add($token);
-			ServiceLocator::GetEmailService()->Send(new TelegramSignupEmail($user, $token->Token()));
+			(new AccessCodeRepository())->Add($token);
+			ServiceLocator::GetEmailService()->Send(new TelegramSignupEmail($user, $token->Code()));
 		}
 		else
 		{
