@@ -37,7 +37,7 @@ class AuthenticationWebService
 		$this->server = $server;
 		$this->authentication = $authentication;
 		$this->userRepository = new UserRepository();
-		$this->tokenRepository = new AccessCodeRepository();
+		$this->accessCodeRepository = new AccessCodeRepository();
 	}
 
 	private function WithClientCredentials($username, $password)
@@ -48,11 +48,11 @@ class AuthenticationWebService
 
 	private function WithCode($code)
 	{
-		$token = $this->tokenRepository->GetByCode($code);
-		$user = $token && $this->userRepository->FindByEmail($token->UserEmail());
+		$token = $this->accessCodeRepository->GetByCode($code);
+		$user = $token ? $this->userRepository->FindByEmail($token->UserEmail()) : false;
 		if($token && $user && $token->isValid())
 		{
-			$this->tokenRepository->Delete($token);
+			$this->accessCodeRepository->Delete($token);
 			return $user->Username();
 		}
 

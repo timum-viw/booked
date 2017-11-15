@@ -19,6 +19,9 @@ along with Booked Scheduler.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 require_once(ROOT_DIR . 'Domain/Access/UserSessionRepository.php');
+require_once(ROOT_DIR . 'lib/external/php-jwt/BeforeValidException.php');
+require_once(ROOT_DIR . 'lib/external/php-jwt/ExpiredException.php');
+require_once(ROOT_DIR . 'lib/external/php-jwt/SignatureInvalidException.php');
 
 class WebServiceSecurity
 {
@@ -30,12 +33,35 @@ class WebServiceSecurity
 	public function __construct(IUserSessionRepository $repository)
 	{
 		$this->repository = $repository;
+		$this->jwt_secret = Configuration::Instance()->GetSectionKey("authentication", "jwt.secret");
+	}
+
+	private function ExtractSessionData($server)
+	{
+		list($bearer, $token) = explode(" ", $server->GetHeader("HTTP_X_AUTHORIZATION"));
+		if($bearer && $token)
+		{
+			try
+			{
+				$token = \Firebase\JWT\JWT::decode($token, $this->jwt_secret, ["HS256"]);
+				return [$token->sessionToken, $token->userId];
+			}
+			catch(\Exception $e)
+			{
+				return false;
+			}
+		}
+		else
+		{
+			$sessionToken = $server->GetHeader(WebServiceHeaders::SESSION_TOKEN);
+			$userId = $server->GetHeader(WebServiceHeaders::USER_ID);
+			return [$sessionToken, $userId];
+		}
 	}
 
 	public function HandleSecureRequest(IRestServer $server, $requireAdminRole = false)
 	{
-		$sessionToken = $server->GetHeader(WebServiceHeaders::SESSION_TOKEN);
-		$userId = $server->GetHeader(WebServiceHeaders::USER_ID);
+		list($sessionToken, $userId) = $this->ExtractSessionData($server);
 
 		Log::Debug('Handling secure request. url=%s, userId=%s, sessionToken=%s', $_SERVER['REQUEST_URI'], $userId, $sessionToken);
 
