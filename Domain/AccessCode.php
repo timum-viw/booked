@@ -19,14 +19,13 @@ along with Booked Scheduler.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 
-class TelegramToken
+class AccessCode
 {
     const DEFAULT_VALID_UNTIL = 3600;
 
     private $user_email;
-    private $token;
+    private $code;
     private $valid_until;
-    private $chat_id;
 
     /**
      * @return string
@@ -41,7 +40,7 @@ class TelegramToken
      */
     public function Token()
     {
-        return $this->token;
+        return $this->code;
     }
 
     /**
@@ -52,44 +51,31 @@ class TelegramToken
         return $this->valid_until;
     }
 
-    public function ChatId()
-    {
-        return $this->chat_id;
-    }
-
-
-    public function __construct($user_email, $token, $valid_until, $chat_id = null)
+    public function __construct($user_email, $code, $valid_until)
     {
         $this->user_email = $user_email;
-        $this->token = $token;
+        $this->code = $code;
         $this->valid_until = $valid_until;
-        $this->chat_id = $chat_id;
     }
 
     public static function Create($user_email, $valid_until = self::DEFAULT_VALID_UNTIL)
     {
-        $token = bin2hex(random_bytes(16));
+        $code = bin2hex(random_bytes(16));
         $valid_until = time() + $valid_until;
-        return new TelegramToken($user_email, $token, $valid_until);
+        return new AccessCode($user_email, $code, $valid_until);
     }
 
     public static function FromRow($row)
     {
-        return new TelegramToken(
+        return new AccessCode(
             $row["user_email"],
-            $row["token"],
-            $row["valid_until"],
-            $row["chat_id"]
+            $row["code"],
+            $row["valid_until"]
         );
     }
 
     public function IsValid()
     {
         return $this->valid_until >= time();
-    }
-
-    public function hasChat()
-    {
-        return $this->chat_id !== null;
     }
 }

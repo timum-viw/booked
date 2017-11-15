@@ -19,6 +19,9 @@ along with Booked Scheduler.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 require_once(ROOT_DIR . 'lib/WebService/namespace.php');
+require_once(ROOT_DIR . 'lib/external/php-jwt/JWT.php');
+
+use \Firebase\JWT\JWT;
 
 class AuthenticationResponse extends RestResponse
 {
@@ -27,6 +30,7 @@ class AuthenticationResponse extends RestResponse
 	public $userId;
 	public $isAuthenticated = false;
 	public $version;
+	public $access_token;
 	
 	/**
 	 * @static
@@ -42,6 +46,13 @@ class AuthenticationResponse extends RestResponse
 		$response->isAuthenticated = true;
 		$response->userId = $userSession->UserId;
 		$response->version = $version;
+
+		$access_token = [
+			"userId" => $userSession->UserId,
+			"sessionToken" => $userSession->SessionToken
+		];
+		$jwt_secret = Configuration::Instance()->GetSectionKey("authentication", "jwt.secret");
+		$response->access_token = JWT::encode($access_token, $jwt_secret);
 		
 		$response->AddService($server, WebServices::Logout);
 		//$response->AddService($server, WebServices::MyBookings, array($userSession->PublicId));

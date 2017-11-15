@@ -40,6 +40,12 @@ class SlimServer implements IRestServer
 
 	public function GetRequest()
 	{
+		$contentType = $this->GetHeader('Content-Type');
+		if($contentType === 'application/x-www-form-urlencoded')
+		{
+			return (object)$_POST;
+		}
+
 		return json_decode($this->slim->request()->getBody());
 	}
 

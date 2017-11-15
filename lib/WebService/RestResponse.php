@@ -37,6 +37,11 @@ class RestResponse
 	 */
 	public $message = null;
 
+	public function __construct($message = null)
+	{
+		$this->message = $message;
+	}
+
 	/**
 	 * @param IRestServer $server
 	 * @param string $serviceName

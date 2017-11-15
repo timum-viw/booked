@@ -23,6 +23,7 @@ require_once(ROOT_DIR . 'lib/Application/Authentication/namespace.php');
 require_once(ROOT_DIR . 'WebServices/Responses/AuthenticationResponse.php');
 require_once(ROOT_DIR . 'WebServices/Requests/AuthenticationRequest.php');
 require_once(ROOT_DIR . 'WebServices/Requests/SignOutRequest.php');
+require_once(ROOT_DIR . 'Domain/Access/AccessCodeRepository.php');
 
 class AuthenticationWebService
 {
@@ -35,6 +36,27 @@ class AuthenticationWebService
 	{
 		$this->server = $server;
 		$this->authentication = $authentication;
+		$this->userRepository = new UserRepository();
+		$this->tokenRepository = new AccessCodeRepository();
+	}
+
+	private function WithClientCredentials($username, $password)
+	{
+		Log::Debug('WebService Authenticate for user %s', $username);
+		return $this->authentication->Validate($username, $password) ? $username : false;
+	}
+
+	private function WithCode($code)
+	{
+		$token = $this->tokenRepository->GetByCode($code);
+		$user = $token && $this->userRepository->FindByEmail($token->UserEmail());
+		if($token && $user && $token->isValid())
+		{
+			$this->tokenRepository->Delete($token);
+			return $user->Username();
+		}
+
+		return false;
 	}
 
 	/**
@@ -48,13 +70,17 @@ class AuthenticationWebService
 	{
 		/** @var $request AuthenticationRequest */
 		$request = $this->server->GetRequest();
-		$username = $request->username;
-		$password = $request->password;
+		$grant_type = $request->grant_type ?? 'client_credentials';
+		if($grant_type === 'client_credentials')
+		{
+			$username = $this->WithClientCredentials($request->username, $request->password);
+		}
+		else if($grant_type === 'authorization_code')
+		{
+			$username = $this->WithCode($request->code);
+		}
 
-		Log::Debug('WebService Authenticate for user %s', $username);
-
-		$isValid = $this->authentication->Validate($username, $password);
-		if ($isValid)
+		if ($username)
 		{
 			Log::Debug('WebService Authenticate, user %s was authenticated', $username);
 
