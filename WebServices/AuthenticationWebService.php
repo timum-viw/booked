@@ -23,7 +23,7 @@ require_once(ROOT_DIR . 'lib/Application/Authentication/namespace.php');
 require_once(ROOT_DIR . 'WebServices/Responses/AuthenticationResponse.php');
 require_once(ROOT_DIR . 'WebServices/Requests/AuthenticationRequest.php');
 require_once(ROOT_DIR . 'WebServices/Requests/SignOutRequest.php');
-require_once(ROOT_DIR . 'Domain/Access/AccessCodeRepository.php');
+require_once(ROOT_DIR . 'Domain/Access/AuthorizationCodeRepository.php');
 
 class AuthenticationWebService
 {
@@ -37,7 +37,7 @@ class AuthenticationWebService
 		$this->server = $server;
 		$this->authentication = $authentication;
 		$this->userRepository = new UserRepository();
-		$this->accessCodeRepository = new AccessCodeRepository();
+		$this->accessCodeRepository = new AuthorizationCodeRepository();
 	}
 
 	private function WithClientCredentials($username, $password)

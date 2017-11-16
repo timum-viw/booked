@@ -91,8 +91,8 @@ class ProfilePresenter extends ActionPresenter
 
 		if($this->enableTelegram)
 		{
-			$token = (new AccessCodeRepository())->AddForUserEmail($user->EmailAddress());
-			$this->page->Set('AccessCode', $token->Token());
+			$token = (new AuthorizationCodeRepository())->AddForUserEmail($user->EmailAddress());
+			$this->page->Set('AuthorizationCode', $token->Token());
 		}
 	}
 

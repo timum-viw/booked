@@ -19,7 +19,7 @@ along with Booked Scheduler.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 
-class AccessCode
+class AuthorizationCode
 {
     const DEFAULT_VALID_UNTIL = 3600;
 
@@ -62,12 +62,12 @@ class AccessCode
     {
         $code = bin2hex(random_bytes(16));
         $valid_until = time() + $valid_until;
-        return new AccessCode($user_email, $code, $valid_until);
+        return new AuthorizationCode($user_email, $code, $valid_until);
     }
 
     public static function FromRow($row)
     {
-        return new AccessCode(
+        return new AuthorizationCode(
             $row["user_email"],
             $row["code"],
             $row["valid_until"]

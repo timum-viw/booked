@@ -1,7 +1,7 @@
 <?php
 
 require_once(ROOT_DIR . 'lib/WebService/namespace.php');
-require_once(ROOT_DIR . 'Domain/AccessCode.php');
+require_once(ROOT_DIR . 'Domain/AuthorizationCode.php');
 require_once(ROOT_DIR . 'lib/Email/Messages/TelegramSignupEmail.php');
 
 class TelegramWebService 
@@ -37,8 +37,8 @@ class TelegramWebService
 				$user = (new Registration())->Register($user_email, $user_email, $firstname, $lastname, Password::GenerateRandom(), null, "en_us", null);
 			}
 
-			$token = AccessCode::Create($user_email);
-			(new AccessCodeRepository())->Add($token);
+			$token = AuthorizationCode::Create($user_email);
+			(new AuthorizationCodeRepository())->Add($token);
 			ServiceLocator::GetEmailService()->Send(new TelegramSignupEmail($user, $token->Code()));
 		}
 		else
