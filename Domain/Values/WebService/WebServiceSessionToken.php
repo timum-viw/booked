@@ -33,7 +33,7 @@ class WebServiceSessionToken
 	{
 		if (empty(self::$_Token))
 		{
-			return uniqid();
+			return bin2hex(random_bytes(16)).uniqid();
 		}
 		return self::$_Token;
 	}
