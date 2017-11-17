@@ -216,5 +216,6 @@ function RegisterTelegram(SlimServer $server, SlimWebServiceRegistry $registry)
 	$telegramService = new TelegramWebService($server, new UserRepository());
 	$category = new SlimWebServiceRegistryCategory('Telegram');
 	$category->AddPost('/signup', array($telegramService, 'Signup'), 'telegram.signup');
+	$category->AddGet('/Status', array($telegramService, 'Status'), 'telegram.status');
 	$registry->AddCategory($category);
 }
