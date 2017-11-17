@@ -21,7 +21,7 @@ p {
 </style>
 <h3>Hi {$FirstName}!</h3>
 <p>Somebody signed you up for the BhhCharite Telegram Bot.</p>
-<p>To finish your registration and start booking please click this link <a href="https://telegram.me/BhhChariteBot?start={$ActivationCode}">https://telegram.me/BhhChariteBot?start={$ActivationCode}</a></p>
+<p>To finish your registration and start booking please click this link <a href="https://telegram.me/BhhChariteBot?start={$ActivationCode}">@BhhChariteBot</a></p>
 <p>If this doesn't work please copy this line
 <pre>
 	/start {$ActivationCode}
