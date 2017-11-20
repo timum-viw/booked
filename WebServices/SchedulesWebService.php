@@ -345,7 +345,7 @@ class ScheduleWebServiceView implements ISchedulePage
 	 */
 	public function GetResourceIds()
 	{
-		return array($this->resourceId);
+		return empty($this->resourceId) ? array() : array($this->resourceId);
 	}
 
 	public function SetResourceGroupTree(ResourceGroupTree $resourceGroupTree)

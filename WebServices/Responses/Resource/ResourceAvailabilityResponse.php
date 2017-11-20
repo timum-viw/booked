@@ -33,7 +33,7 @@ class ResourcesAvailabilityResponse extends RestResponse
 	 */
 	public function __construct(IRestServer $server, $resources)
 	{
-		$this->resources[] = $resources;
+		$this->resources = $resources;
 	}
 
 	public static function Example()
