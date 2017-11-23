@@ -100,7 +100,7 @@ class AuthenticationWebService
 		{
 			Log::Debug('WebService Authenticate, user %s was not authenticated', $username);
 
-			$this->server->WriteResponse(AuthenticationResponse::Failed());
+			$this->server->WriteResponse(AuthenticationResponse::Failed(), RestResponse::NOT_FOUND_CODE);
 		}
 	}
 
